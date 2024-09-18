@@ -1,29 +1,27 @@
 import tkinter
 import customtkinter
-from pytube import YouTube
+from yt_dlp import YoutubeDL
 
 def startDownload():
     try:
         ytLink = link.get()
-        ytObject = YouTube(ytLink, on_progress_callback=on_progress)
-        video = ytObject.streams.get_highest_resolution()
-        title.configure(text=ytObject.title)
-        finishLabel.configure(text="")
-        video.download()
+        ydl_opts = {
+            'format': 'best',
+            'progress_hooks': [on_progress_hook],
+            'nocolor': True  # Disable colored output to avoid parsing issues
+        }
+        with YoutubeDL(ydl_opts) as ydl:
+            ydl.download([ytLink])
         finishLabel.configure(text="Download Complete!", text_color="green")
     except Exception as e:
         finishLabel.configure(text="Download Error: " + str(e), text_color="red")
 
-def on_progress(stream, chunk, bytes_remaining):
-    total_size = stream.filesize
-    bytes_downloaded = total_size - bytes_remaining
-    percentage_of_completion = bytes_downloaded / total_size * 100
-    per = str(int(percentage_of_completion))
-    progressPercentage.configure(text=per + "%")
-    progressPercentage.update()
-
-    # Update Progress Bar
-    progressBar.set(float(percentage_of_completion) / 100)
+def on_progress_hook(d):
+    if d['status'] == 'downloading':
+        percentage = d.get('_percent_str', '0%')
+        clean_percentage = ''.join(c for c in percentage if c.isdigit() or c == '.').strip('%')
+        progressPercentage.configure(text=clean_percentage + "%")
+        progressBar.set(float(clean_percentage) / 100)
 
 # System Settings
 customtkinter.set_appearance_mode("System")
