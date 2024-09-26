@@ -26,7 +26,7 @@ Pytube is a simple YouTube video downloader built using Python. It provides a st
 
 1.  Clone this repository:
     
-	    git clone https://github.com/yourusername/pytube-downloader.git
+	    git clone https://github.com/DanielShaw98/pytube-downloader.git
 
 2.  Install the required dependencies:
     
